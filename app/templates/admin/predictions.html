@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-graph-up"></i> ML Predictions</h2>
+</div>
+
+{% if not data.ready %}
+<div class="card shadow-sm border-0">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-hourglass-split fs-1 text-muted"></i>
+        <h4 class="mt-3">Not Enough Data Yet</h4>
+        <p class="text-muted">We need at least 30 days of transaction data to make predictions.</p>
+        <div class="progress mt-3 mx-auto" style="max-width: 400px; height: 20px;">
+            <div class="progress-bar bg-dark" 
+                 data-width="{{ (data.days_available / 30 * 100)|int }}"
+                style="width: 50%">
+                {{ data.days_available }} / 30 days
+            </div>
+        </div>
+        <p class="text-muted mt-2">{{ data.days_needed }} more days needed</p>
+    </div>
+</div>
+
+{% else %}
+<!-- Model Performance -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-dark text-white fw-bold">
+        <i class="bi bi-cpu"></i> ML Model Performance (Random Forest)
+    </div>
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>MAE (Avg Error)</th>
+                    <th>R² Score</th>
+                    <th>Model Quality</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in data.model_performance %}
+                <tr>
+                    <td><strong>{{ m.product_name }}</strong></td>
+                    <td>{{ m.mae }} units</td>
+                    <td>{{ m.r2 }}</td>
+                    <td>
+                        {% if m.r2 >= 0.7 %}
+                            <span class="badge bg-success">Strong</span>
+                        {% elif m.r2 >= 0.4 %}
+                            <span class="badge bg-warning text-dark">Moderate</span>
+                        {% elif m.r2 >= 0 %}
+                            <span class="badge bg-secondary">Weak</span>
+                        {% else %}
+                            <span class="badge bg-danger">Poor</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <small class="text-muted">
+            <i class="bi bi-info-circle"></i> 
+            MAE = Average prediction error in units. R² = How well the model explains sales variance (1.0 = perfect).
+        </small>
+    </div>
+</div>
+<!-- Stockout Predictions -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-dark text-white fw-bold">
+        <i class="bi bi-clock"></i> Stockout Predictions — Days Until Empty
+    </div>
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Current Stock</th>
+                    <th>Days Until Stockout</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in data.stockout_predictions %}
+                <tr>
+                    <td><strong>{{ p.name }}</strong></td>
+                    <td>{{ p.current_stock }} {{ p.unit }}</td>
+                    <td>{{ p.days_until_stockout }} days</td>
+                    <td>
+                        {% if p.status == 'critical' %}
+                            <span class="badge bg-danger">Critical — Order Now!</span>
+                        {% elif p.status == 'warning' %}
+                            <span class="badge bg-warning text-dark">Warning — Order Soon</span>
+                        {% else %}
+                            <span class="badge bg-success">OK</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Best and Worst Sellers -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-success text-white fw-bold">
+                <i class="bi bi-trophy"></i> Best Sellers
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Total Sold</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in data.best_sellers %}
+                        <tr>
+                            <td>{{ p.product_name }}</td>
+                            <td><strong>{{ p.total_sold|int }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-secondary text-white fw-bold">
+                <i class="bi bi-graph-down"></i> Worst Sellers
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Total Sold</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in data.worst_sellers %}
+                        <tr>
+                            <td>{{ p.product_name }}</td>
+                            <td><strong>{{ p.total_sold|int }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales by Day, Month, Quarter -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white fw-bold">
+                <i class="bi bi-calendar-day"></i> Sales by Day
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Day</th><th>Units Sold</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for d in data.sales_by_day %}
+                        <tr>
+                            <td>{{ d.day_name }}</td>
+                            <td><strong>{{ d.quantity|int }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white fw-bold">
+                <i class="bi bi-calendar-month"></i> Sales by Month
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Month</th><th>Units Sold</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for m in data.sales_by_month %}
+                        <tr>
+                            <td>{{ m.month_name }}</td>
+                            <td><strong>{{ m.quantity|int }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white fw-bold">
+                <i class="bi bi-calendar-quarter"></i> Sales by Quarter
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Quarter</th><th>Units Sold</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for q in data.sales_by_quarter %}
+                        <tr>
+                            <td>{{ q.quarter_name }}</td>
+                            <td><strong>{{ q.quantity|int }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

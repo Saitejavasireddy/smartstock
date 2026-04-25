@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-speedometer2"></i> Stock Status</h2>
+    <a href="{{ url_for('employee.update_stock') }}" class="btn btn-dark">
+        <i class="bi bi-arrow-left-right"></i> Update Stock
+    </a>
+</div>
+
+{% if low_stock %}
+<div class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle"></i>
+    <strong>{{ low_stock|length }} product(s) are running low on stock!</strong>
+</div>
+{% endif %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        {% if products %}
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Current Stock</th>
+                    <th>Unit</th>
+                    <th>Threshold</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.category }}</td>
+                    <td>{{ p.current_stock }}</td>
+                    <td>{{ p.unit }}</td>
+                    <td>{{ p.threshold }}</td>
+                    <td>
+                        {% if p.current_stock <= p.threshold %}
+                            <span class="badge bg-danger">Low Stock</span>
+                        {% elif p.current_stock <= p.threshold * 1.5 %}
+                            <span class="badge bg-warning text-dark">Warning</span>
+                        {% else %}
+                            <span class="badge bg-success">OK</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="text-muted text-center py-4">No products available.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

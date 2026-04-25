@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-person-plus"></i> Add Employee</h2>
+    <a href="{{ url_for('admin.employees') }}" class="btn btn-outline-dark">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" 
+                           placeholder="e.g. John Smith" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" 
+                           placeholder="e.g. john@smartstock.com" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" 
+                           placeholder="Set a password" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-dark">
+                <i class="bi bi-check-circle"></i> Add Employee
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
