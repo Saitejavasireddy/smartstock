@@ -23,7 +23,7 @@ def login():
             flash('Invalid email or password', 'danger')
             return redirect(url_for('auth.login'))
         
-        login_user(user)
+        login_user(user, remember=True)
         
         if user.role == 'admin':
             return redirect(url_for('admin.dashboard'))
