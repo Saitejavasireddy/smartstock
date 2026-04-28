@@ -2,25 +2,38 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold"><i class="bi bi-speedometer2"></i> Stock Status</h2>
-    <a href="{{ url_for('employee.update_stock') }}" class="btn btn-dark">
-        <i class="bi bi-arrow-left-right"></i> Update Stock
-    </a>
+<div class="page-header" data-aos="fade-down">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="bi bi-speedometer2"></i> Stock Status</h2>
+            <p class="mb-0 opacity-75">Current inventory levels</p>
+        </div>
+        <a href="{{ url_for('employee.update_stock') }}" class="btn"
+           style="background:rgba(255,255,255,0.2);color:white;border-radius:10px;font-weight:600;">
+            <i class="bi bi-arrow-left-right"></i> Update Stock
+        </a>
+    </div>
 </div>
 
 {% if low_stock %}
-<div class="alert alert-danger">
-    <i class="bi bi-exclamation-triangle"></i>
-    <strong>{{ low_stock|length }} product(s) are running low on stock!</strong>
+<div class="card mb-4" data-aos="fade-up" style="border-left:4px solid #f5576c !important;">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:2rem;"></i>
+            <div>
+                <strong class="text-danger">{{ low_stock|length }} product(s) are running low!</strong>
+                <p class="mb-0 text-muted small">Please notify your manager immediately.</p>
+            </div>
+        </div>
+    </div>
 </div>
 {% endif %}
 
-<div class="card shadow-sm border-0">
-    <div class="card-body">
+<div class="card" data-aos="fade-up">
+    <div class="card-body p-0">
         {% if products %}
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
+        <table class="table mb-0">
+            <thead>
                 <tr>
                     <th>Name</th>
                     <th>Category</th>
@@ -33,18 +46,24 @@
             <tbody>
                 {% for p in products %}
                 <tr>
-                    <td>{{ p.name }}</td>
-                    <td>{{ p.category }}</td>
-                    <td>{{ p.current_stock }}</td>
+                    <td><strong>{{ p.name }}</strong></td>
+                    <td><span class="badge" style="background:#f0f0f0;color:#666;">{{ p.category }}</span></td>
+                    <td>
+                        {% if p.current_stock <= p.threshold %}
+                            <strong class="text-danger">{{ p.current_stock }}</strong>
+                        {% else %}
+                            {{ p.current_stock }}
+                        {% endif %}
+                    </td>
                     <td>{{ p.unit }}</td>
                     <td>{{ p.threshold }}</td>
                     <td>
                         {% if p.current_stock <= p.threshold %}
-                            <span class="badge bg-danger">Low Stock</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#f5576c,#f093fb);">Low Stock</span>
                         {% elif p.current_stock <= p.threshold * 1.5 %}
-                            <span class="badge bg-warning text-dark">Warning</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#f7971e,#ffd200);color:#333;">Warning</span>
                         {% else %}
-                            <span class="badge bg-success">OK</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#11998e,#38ef7d);">OK</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -52,7 +71,10 @@
             </tbody>
         </table>
         {% else %}
-            <p class="text-muted text-center py-4">No products available.</p>
+        <div class="text-center py-5">
+            <i class="bi bi-box-seam" style="font-size:4rem;color:#dee2e6;"></i>
+            <p class="text-muted mt-3">No products available.</p>
+        </div>
         {% endif %}
     </div>
 </div>

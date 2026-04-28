@@ -2,36 +2,42 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold"><i class="bi bi-person-plus"></i> Add Employee</h2>
-    <a href="{{ url_for('admin.employees') }}" class="btn btn-outline-dark">
-        <i class="bi bi-arrow-left"></i> Back
-    </a>
+<div class="page-header" data-aos="fade-down">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="bi bi-person-plus"></i> Add Employee</h2>
+            <p class="mb-0 opacity-75">Create a new employee account</p>
+        </div>
+        <a href="{{ url_for('admin.employees') }}" class="btn"
+           style="background:rgba(255,255,255,0.2);color:white;border-radius:10px;font-weight:600;">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
 </div>
 
-<div class="card shadow-sm border-0">
+<div class="card" data-aos="fade-up">
     <div class="card-body p-4">
         <form method="POST">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-control" 
+                    <input type="text" name="name" class="form-control"
                            placeholder="e.g. John Smith" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Email Address</label>
-                    <input type="email" name="email" class="form-control" 
-                           placeholder="e.g. john@smartstock.com" required>
+                    <input type="email" name="email" class="form-control"
+                           placeholder="e.g. john@store.com" required>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" 
+                    <input type="password" name="password" class="form-control"
                            placeholder="Set a password" required>
                 </div>
             </div>
-            <button type="submit" class="btn btn-dark">
+            <button type="submit" class="btn btn-primary px-4">
                 <i class="bi bi-check-circle"></i> Add Employee
             </button>
         </form>

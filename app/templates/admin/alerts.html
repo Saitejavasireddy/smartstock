@@ -2,15 +2,20 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold"><i class="bi bi-bell"></i> Alerts</h2>
+<div class="page-header" data-aos="fade-down">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="bi bi-bell"></i> Alerts</h2>
+            <p class="mb-0 opacity-75">Low stock notifications for your store</p>
+        </div>
+    </div>
 </div>
 
-<div class="card shadow-sm border-0">
-    <div class="card-body">
+<div class="card" data-aos="fade-up">
+    <div class="card-body p-0">
         {% if alerts %}
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
+        <table class="table mb-0">
+            <thead>
                 <tr>
                     <th>Product</th>
                     <th>Message</th>
@@ -22,16 +27,18 @@
             </thead>
             <tbody>
                 {% for a in alerts %}
-                <tr class="{{ 'table-warning' if not a.is_read else '' }}">
+                <tr {% if not a.is_read %}style="background:rgba(102,126,234,0.05);"{% endif %}>
                     <td><strong>{{ a.product.name }}</strong></td>
                     <td>{{ a.message }}</td>
                     <td>
-                        <span class="badge bg-danger">{{ a.alert_type }}</span>
+                        <span class="badge" style="background:linear-gradient(135deg,#f5576c,#f093fb);">
+                            {{ a.alert_type }}
+                        </span>
                     </td>
                     <td>{{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                     <td>
                         {% if not a.is_read %}
-                            <span class="badge bg-warning text-dark">Unread</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#f7971e,#ffd200);color:#333;">Unread</span>
                         {% else %}
                             <span class="badge bg-secondary">Read</span>
                         {% endif %}
@@ -39,7 +46,8 @@
                     <td>
                         {% if not a.is_read %}
                         <form method="POST" action="{{ url_for('admin.mark_read', id=a.id) }}" style="display:inline">
-                            <button type="submit" class="btn btn-sm btn-outline-dark">
+                            <button type="submit" class="btn btn-sm"
+                                    style="background:rgba(102,126,234,0.1);color:#667eea;border-radius:8px;">
                                 <i class="bi bi-check"></i> Mark Read
                             </button>
                         </form>
@@ -50,7 +58,10 @@
             </tbody>
         </table>
         {% else %}
-            <p class="text-muted text-center py-4">No alerts yet.</p>
+        <div class="text-center py-5">
+            <i class="bi bi-bell" style="font-size:4rem;color:#dee2e6;"></i>
+            <p class="text-muted mt-3">No alerts yet. All stock levels are healthy!</p>
+        </div>
         {% endif %}
     </div>
 </div>
