@@ -2,60 +2,53 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold"><i class="bi bi-speedometer2"></i> Dashboard</h2>
-    <span class="text-muted">Welcome back, {{ current_user.name }}!</span>
+<div class="page-header" data-aos="fade-down">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+            <p class="mb-0 opacity-75">Welcome back, {{ current_user.name }}! Here's what's happening.</p>
+        </div>
+        <div>
+            <span class="badge" style="background:rgba(255,255,255,0.2); font-size:0.85rem; padding:0.5rem 1rem;">
+                <i class="bi bi-shop"></i> {{ current_user.store_name or 'My Store' }}
+            </span>
+        </div>
+    </div>
 </div>
 
 <!-- Summary Cards -->
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 bg-dark text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <p class="mb-1">Total Products</p>
-                        <h3 class="fw-bold">{{ total_products }}</h3>
-                    </div>
-                    <i class="bi bi-box-seam fs-1 opacity-50"></i>
-                </div>
-            </div>
+<div class="row g-4 mb-4">
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+        <div class="stat-card">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-number mt-2">{{ total_products }}</div>
+            <i class="bi bi-box-seam stat-icon"></i>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 bg-danger text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <p class="mb-1">Low Stock Items</p>
-                        <h3 class="fw-bold">{{ low_stock }}</h3>
-                    </div>
-                    <i class="bi bi-exclamation-triangle fs-1 opacity-50"></i>
-                </div>
-            </div>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="stat-card danger">
+            <div class="stat-label">Low Stock Items</div>
+            <div class="stat-number mt-2">{{ low_stock }}</div>
+            <i class="bi bi-exclamation-triangle stat-icon"></i>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 bg-warning text-dark">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <p class="mb-1">Unread Alerts</p>
-                        <h3 class="fw-bold">{{ unread_alerts }}</h3>
-                    </div>
-                    <i class="bi bi-bell fs-1 opacity-50"></i>
-                </div>
-            </div>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-card warning">
+            <div class="stat-label">Unread Alerts</div>
+            <div class="stat-number mt-2">{{ unread_alerts }}</div>
+            <i class="bi bi-bell stat-icon"></i>
         </div>
     </div>
 </div>
+
+<!-- Low Stock Alert Panel -->
 {% if low_stock_products %}
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-danger text-white fw-bold">
+<div class="card mb-4" data-aos="fade-up">
+    <div class="card-header" style="background:linear-gradient(135deg,#f5576c,#f093fb); color:white;">
         <i class="bi bi-exclamation-triangle"></i> Low Stock Alerts — Order These Now!
     </div>
-    <div class="card-body">
-        <table class="table table-hover align-middle mb-0">
+    <div class="card-body p-0">
+        <table class="table mb-0">
             <thead>
                 <tr>
                     <th>Product</th>
@@ -68,14 +61,14 @@
             </thead>
             <tbody>
                 {% for p in low_stock_products %}
-                <tr class="table-danger">
+                <tr>
                     <td><strong>{{ p.name }}</strong></td>
                     <td>{{ p.category }}</td>
-                    <td><strong>{{ p.current_stock }}</strong></td>
+                    <td><strong class="text-danger">{{ p.current_stock }}</strong></td>
                     <td>{{ p.threshold }}</td>
                     <td>{{ p.unit }}</td>
                     <td>
-                        <span class="badge bg-danger">
+                        <span class="badge" style="background:linear-gradient(135deg,#f5576c,#f093fb);">
                             <i class="bi bi-cart"></i> Order {{ p.threshold * 2 }} {{ p.unit }}
                         </span>
                     </td>
@@ -86,14 +79,16 @@
     </div>
 </div>
 {% endif %}
+
 <!-- Recent Transactions -->
-<div class="card shadow-sm border-0">
-    <div class="card-header bg-white fw-bold">
-        <i class="bi bi-clock-history"></i> Recent Transactions
+<div class="card mb-4" data-aos="fade-up">
+    <div class="card-header bg-white">
+        <i class="bi bi-clock-history" style="color:#667eea"></i> 
+        <span style="color:#667eea; font-weight:700;">Recent Transactions</span>
     </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         {% if recent_transactions %}
-        <table class="table table-hover">
+        <table class="table mb-0">
             <thead>
                 <tr>
                     <th>Product</th>
@@ -106,12 +101,12 @@
             <tbody>
                 {% for t in recent_transactions %}
                 <tr>
-                    <td>{{ t.product.name }}</td>
+                    <td><strong>{{ t.product.name }}</strong></td>
                     <td>
                         {% if t.type == 'sale' %}
-                            <span class="badge bg-danger">Sale</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#f5576c,#f093fb);">Sale</span>
                         {% else %}
-                            <span class="badge bg-success">Restock</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#11998e,#38ef7d);">Restock</span>
                         {% endif %}
                     </td>
                     <td>{{ t.quantity }}</td>
@@ -122,17 +117,18 @@
             </tbody>
         </table>
         {% else %}
-            <p class="text-muted text-center">No transactions yet.</p>
+            <p class="text-muted text-center py-4">No transactions yet.</p>
         {% endif %}
     </div>
 </div>
 
 <!-- Charts -->
-<div class="row mt-4">
+<div class="row g-4" data-aos="fade-up">
     <div class="col-md-8">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-graph-up"></i> Sales Trend — Last 30 Days
+        <div class="card">
+            <div class="card-header bg-white">
+                <i class="bi bi-graph-up" style="color:#667eea"></i>
+                <span style="color:#667eea; font-weight:700;"> Sales Trend — Last 30 Days</span>
             </div>
             <div class="card-body">
                 <canvas id="salesTrendChart"></canvas>
@@ -140,9 +136,10 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-bar-chart"></i> Top Products
+        <div class="card">
+            <div class="card-header bg-white">
+                <i class="bi bi-bar-chart" style="color:#667eea"></i>
+                <span style="color:#667eea; font-weight:700;"> Top Products</span>
             </div>
             <div class="card-body">
                 <canvas id="topProductsChart"></canvas>
@@ -153,7 +150,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Sales Trend Chart
     const salesCtx = document.getElementById('salesTrendChart').getContext('2d');
     new Chart(salesCtx, {
         type: 'line',
@@ -162,48 +158,41 @@
             datasets: [{
                 label: 'Units Sold',
                 data: {{ chart_data | tojson }},
-                borderColor: '#212529',
-                backgroundColor: 'rgba(33, 37, 41, 0.1)',
-                borderWidth: 2,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: '#667eea',
+                pointRadius: 4
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } } }
         }
     });
 
-    // Top Products Chart
     const productCtx = document.getElementById('topProductsChart').getContext('2d');
     new Chart(productCtx, {
         type: 'bar',
         data: {
             labels: {{ product_labels | tojson }},
             datasets: [{
-                label: 'Units Sold',
                 data: {{ product_data | tojson }},
                 backgroundColor: [
-                    '#212529', '#495057', '#6c757d',
-                    '#adb5bd', '#ced4da', '#dee2e6'
+                    'rgba(102,126,234,0.8)', 'rgba(118,75,162,0.8)',
+                    'rgba(245,87,108,0.8)', 'rgba(17,153,142,0.8)',
+                    'rgba(247,151,30,0.8)', 'rgba(56,239,125,0.8)'
                 ],
-                borderRadius: 5
+                borderRadius: 8
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } } }
         }
     });
 </script>

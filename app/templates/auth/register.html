@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="row justify-content-center mt-5">
+<div class="row justify-content-center mt-4">
     <div class="col-md-5">
-        <div class="card shadow border-0">
+        <div class="card p-2">
             <div class="card-body p-4">
                 <div class="text-center mb-4">
-                    <i class="bi bi-shop fs-1 text-dark"></i>
-                    <h3 class="fw-bold mt-2">Create Your Store</h3>
+                    <div style="width:70px;height:70px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                        <i class="bi bi-shop text-white" style="font-size:2rem;"></i>
+                    </div>
+                    <h3 class="fw-bold">Create Your Store</h3>
                     <p class="text-muted">Set up your SmartStock account</p>
                 </div>
 
@@ -28,22 +29,25 @@
                         <input type="email" name="email" class="form-control" 
                                placeholder="your@email.com" required>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label class="form-label">Password</label>
                         <input type="password" name="password" class="form-control" 
-                               placeholder="Create a password" required>
+                               placeholder="Create a strong password" required>
                     </div>
-                    <button type="submit" class="btn btn-dark w-100 mb-3">
+                    <button type="submit" class="btn btn-primary w-100 mb-3 py-2">
                         <i class="bi bi-check-circle"></i> Create Account
                     </button>
-                    <p class="text-center text-muted">
-                        Already have an account? 
-                        <a href="{{ url_for('auth.login') }}">Login here</a>
-                    </p>
+                    <div class="text-center">
+                        <p class="text-muted mb-1">Already have an account? 
+                            <a href="{{ url_for('auth.login') }}" style="color:#667eea;font-weight:600;">Login here</a>
+                        </p>
+                        <p class="text-muted">
+                            <a href="{{ url_for('auth.landing') }}" style="color:#667eea;">← Back to home</a>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

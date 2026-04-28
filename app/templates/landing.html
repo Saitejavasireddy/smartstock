@@ -1,64 +1,411 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStock - Intelligent Inventory Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; }
 
-{% block content %}
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-<!-- Hero Section -->
-<div class="row min-vh-75 align-items-center py-5">
-    <div class="col-md-6">
-        <h1 class="display-4 fw-bold mb-3">
-            Smart Inventory,<br>
-            <span class="text-dark">Zero Guesswork.</span>
-        </h1>
-        <p class="lead text-muted mb-4">
-            SmartStock automatically tracks your inventory, alerts you when stock runs low, 
-            and predicts what to order before you run out. Say goodbye to manual stock checks.
-        </p>
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            bottom: -100px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .hero-content { position: relative; z-index: 2; }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1.1;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #ffd200, #f7971e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.85);
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        .hero-buttons {
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+            opacity: 0;
+        }
+
+        .btn-hero-primary {
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 50px;
+            padding: 0.9rem 2.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            color: #667eea;
+        }
+
+        .btn-hero-secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 50px;
+            padding: 0.9rem 2.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* 3D Box Animation */
+        .hero-visual {
+            animation: slideInRight 0.8s ease 0.3s forwards;
+            opacity: 0;
+            position: relative;
+        }
+
+        .box-3d {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            margin: auto;
+            animation: rotate3d 8s linear infinite;
+        }
+
+        @keyframes rotate3d {
+            0% { transform: perspective(800px) rotateY(0deg) rotateX(10deg); }
+            100% { transform: perspective(800px) rotateY(360deg) rotateX(10deg); }
+        }
+
+        .box-3d i {
+            font-size: 15rem;
+            color: rgba(255,255,255,0.15);
+            filter: drop-shadow(0 0 30px rgba(255,255,255,0.3));
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+            opacity: 0;
+        }
+
+        .stat-item { text-align: center; }
+        .stat-item .number { font-size: 2rem; font-weight: 800; color: white; }
+        .stat-item .label { font-size: 0.8rem; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+
+        /* Features Section */
+        .features { padding: 6rem 0; background: #f8f9ff; }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+            transition: all 0.3s;
+            height: 100%;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .feature-card h5 { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .feature-card p { color: #718096; font-size: 0.9rem; line-height: 1.6; }
+
+        /* How it works */
+        .how-it-works { padding: 6rem 0; background: white; }
+
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            text-align: center;
+        }
+
+        /* Navbar */
+        .landing-nav {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            padding: 1.5rem 0;
+        }
+
+        .landing-nav .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="landing-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="brand" href="#"><i class="bi bi-box-seam"></i> SmartStock</a>
         <div class="d-flex gap-3">
-            <a href="{{ url_for('auth.register') }}" class="btn btn-dark btn-lg px-4">
-                <i class="bi bi-shop"></i> I'm a Store Owner
-            </a>
-            <a href="{{ url_for('auth.employee_login') }}" class="btn btn-outline-dark btn-lg px-4">
-                <i class="bi bi-person"></i> Employee Login
-            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary btn">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="btn-hero-primary btn">Get Started Free</a>
         </div>
     </div>
-    <div class="col-md-6 text-center">
-        <i class="bi bi-box-seam" style="font-size: 12rem; color: #dee2e6;"></i>
-    </div>
-</div>
+</nav>
 
-<!-- Features Section -->
-<hr class="my-5">
-<div class="row text-center mb-5">
-    <h2 class="fw-bold mb-5">Why SmartStock?</h2>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 p-3">
-            <i class="bi bi-bell fs-1 mb-3 text-danger"></i>
-            <h5 class="fw-bold">Auto Alerts</h5>
-            <p class="text-muted">Get email alerts instantly when any product drops below your threshold.</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 p-3">
-            <i class="bi bi-graph-up fs-1 mb-3 text-success"></i>
-            <h5 class="fw-bold">ML Predictions</h5>
-            <p class="text-muted">Our AI predicts when products will run out before they actually do.</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 p-3">
-            <i class="bi bi-trophy fs-1 mb-3 text-warning"></i>
-            <h5 class="fw-bold">Best Sellers</h5>
-            <p class="text-muted">Know exactly which products sell most by day, month and season.</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 p-3">
-            <i class="bi bi-people fs-1 mb-3 text-primary"></i>
-            <h5 class="fw-bold">Team Access</h5>
-            <p class="text-muted">Give your employees access to update stock in real time.</p>
-        </div>
-    </div>
-</div>
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 hero-content">
+                <h1>Smart Inventory,<br><span>Zero Guesswork.</span></h1>
+                <p class="my-4">SmartStock automatically tracks your inventory, sends instant alerts when stock runs low, and uses AI to predict what to order before you run out.</p>
+                <div class="hero-buttons d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-hero-primary">
+                        <i class="bi bi-shop"></i> Start Free Today
+                    </a>
+                    <a href="{{ url_for('auth.employee_login') }}" class="btn btn-hero-secondary">
+                        <i class="bi bi-person"></i> Employee Login
+                    </a>
+                </div>
 
-{% endblock %}
+                <!-- Stats -->
+                <div class="stats-bar mt-5">
+                    <div class="row">
+                        <div class="col-4 stat-item">
+                            <div class="number">100%</div>
+                            <div class="label">Automated</div>
+                        </div>
+                        <div class="col-4 stat-item">
+                             <div class="number">ML</div>
+                             <div class="label">Predictions</div>
+                        </div>
+                        <div class="col-4 stat-item">
+                            <div class="number">24/7</div>
+                            <div class="label">Monitoring</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 hero-visual text-center">
+                <div class="box-3d">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Why SmartStock?</h2>
+            <p class="text-muted mt-2">Everything you need to run a smarter inventory</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #f5576c20, #f09330020)">
+                        <i class="bi bi-bell-fill" style="color: #f5576c"></i>
+                    </div>
+                    <h5>Auto Alerts</h5>
+                    <p>Get instant email alerts when any product drops below your set threshold. Never run out again.</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #667eea20, #764ba220)">
+                        <i class="bi bi-graph-up-arrow" style="color: #667eea"></i>
+                    </div>
+                    <h5>ML Predictions</h5>
+                    <p>Our AI predicts when products will run out before they do, giving you time to reorder smartly.</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #11998e20, #38ef7d20)">
+                        <i class="bi bi-trophy-fill" style="color: #11998e"></i>
+                    </div>
+                    <h5>Best Sellers</h5>
+                    <p>Know exactly which products sell most by day, month, and season to optimize your orders.</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #f7971e20, #ffd20020)">
+                        <i class="bi bi-people-fill" style="color: #f7971e"></i>
+                    </div>
+                    <h5>Team Access</h5>
+                    <p>Give employees access to update stock in real time while you stay in control as admin.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">How It Works</h2>
+            <p class="text-muted mt-2">Up and running in 3 simple steps</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h5 class="fw-bold mt-3">Create Your Store</h5>
+                    <p class="text-muted">Sign up as a store owner, add your products and set reorder thresholds for each one.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="150">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h5 class="fw-bold mt-3">Track Every Sale</h5>
+                    <p class="text-muted">You and your employees record every sale and restock. The system keeps track automatically.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h5 class="fw-bold mt-3">Get Smart Alerts</h5>
+                    <p class="text-muted">Receive instant email alerts and AI predictions. Know what to order before you run out.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" data-aos="fade-up">
+    <div class="container">
+        <h2 class="text-white fw-bold display-5 mb-3">Ready to go smart?</h2>
+        <p class="text-white opacity-75 mb-4 fs-5">Join store owners who never run out of stock again.</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-hero-primary btn-lg px-5">
+            <i class="bi bi-rocket-takeoff"></i> Get Started Free
+        </a>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({ duration: 700, once: true });</script>
+</body>
+</html>
