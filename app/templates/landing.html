@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="row min-vh-75 align-items-center py-5">
+    <div class="col-md-6">
+        <h1 class="display-4 fw-bold mb-3">
+            Smart Inventory,<br>
+            <span class="text-dark">Zero Guesswork.</span>
+        </h1>
+        <p class="lead text-muted mb-4">
+            SmartStock automatically tracks your inventory, alerts you when stock runs low, 
+            and predicts what to order before you run out. Say goodbye to manual stock checks.
+        </p>
+        <div class="d-flex gap-3">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-dark btn-lg px-4">
+                <i class="bi bi-shop"></i> I'm a Store Owner
+            </a>
+            <a href="{{ url_for('auth.employee_login') }}" class="btn btn-outline-dark btn-lg px-4">
+                <i class="bi bi-person"></i> Employee Login
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6 text-center">
+        <i class="bi bi-box-seam" style="font-size: 12rem; color: #dee2e6;"></i>
+    </div>
+</div>
+
+<!-- Features Section -->
+<hr class="my-5">
+<div class="row text-center mb-5">
+    <h2 class="fw-bold mb-5">Why SmartStock?</h2>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <i class="bi bi-bell fs-1 mb-3 text-danger"></i>
+            <h5 class="fw-bold">Auto Alerts</h5>
+            <p class="text-muted">Get email alerts instantly when any product drops below your threshold.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <i class="bi bi-graph-up fs-1 mb-3 text-success"></i>
+            <h5 class="fw-bold">ML Predictions</h5>
+            <p class="text-muted">Our AI predicts when products will run out before they actually do.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <i class="bi bi-trophy fs-1 mb-3 text-warning"></i>
+            <h5 class="fw-bold">Best Sellers</h5>
+            <p class="text-muted">Know exactly which products sell most by day, month and season.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <i class="bi bi-people fs-1 mb-3 text-primary"></i>
+            <h5 class="fw-bold">Team Access</h5>
+            <p class="text-muted">Give your employees access to update stock in real time.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

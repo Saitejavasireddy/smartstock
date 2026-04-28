@@ -4,6 +4,7 @@ from app.admin import admin
 from app.models import Product, Transaction, Alert, User
 from app import db
 from functools import wraps
+from datetime import datetime, timedelta
 
 def admin_required(f):
     @wraps(f)
@@ -18,36 +19,41 @@ def admin_required(f):
 @login_required
 @admin_required
 def dashboard():
-    from datetime import datetime, timedelta
-    
-    total_products = Product.query.count()
-    low_stock_products = Product.query.filter(Product.current_stock <= Product.threshold).all()
-    unread_alerts = Alert.query.filter_by(is_read=False).count()
-    recent_transactions = Transaction.query.order_by(Transaction.timestamp.desc()).limit(5).all()
+    total_products = Product.query.filter_by(owner_id=current_user.id).count()
+    low_stock_products = Product.query.filter(
+        Product.owner_id == current_user.id,
+        Product.current_stock <= Product.threshold
+    ).all()
+    unread_alerts = Alert.query.join(Product).filter(
+        Product.owner_id == current_user.id,
+        Alert.is_read == False
+    ).count()
+    recent_transactions = Transaction.query.join(Product).filter(
+        Product.owner_id == current_user.id
+    ).order_by(Transaction.timestamp.desc()).limit(5).all()
 
-    # Data for sales trend chart (last 30 days)
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
     daily_sales = db.session.execute(db.text("""
-        SELECT DATE(timestamp) as date, SUM(quantity) as total
-        FROM transactions
-        WHERE type = 'sale' AND timestamp >= :start
-        GROUP BY DATE(timestamp)
-        ORDER BY DATE(timestamp)
-    """), {'start': thirty_days_ago}).fetchall()
+        SELECT DATE(t.timestamp) as date, SUM(t.quantity) as total
+        FROM transactions t
+        JOIN products p ON t.product_id = p.id
+        WHERE t.type = 'sale' AND t.timestamp >= :start AND p.owner_id = :owner_id
+        GROUP BY DATE(t.timestamp)
+        ORDER BY DATE(t.timestamp)
+    """), {'start': thirty_days_ago, 'owner_id': current_user.id}).fetchall()
 
     chart_labels = [str(row[0]) for row in daily_sales]
     chart_data = [float(row[1]) for row in daily_sales]
 
-    # Data for top products chart
     top_products = db.session.execute(db.text("""
         SELECT p.name, SUM(t.quantity) as total
         FROM transactions t
         JOIN products p ON t.product_id = p.id
-        WHERE t.type = 'sale'
+        WHERE t.type = 'sale' AND p.owner_id = :owner_id
         GROUP BY p.name
         ORDER BY total DESC
         LIMIT 6
-    """)).fetchall()
+    """), {'owner_id': current_user.id}).fetchall()
 
     product_labels = [row[0] for row in top_products]
     product_data = [float(row[1]) for row in top_products]
@@ -63,11 +69,12 @@ def dashboard():
                            chart_data=chart_data,
                            product_labels=product_labels,
                            product_data=product_data)
+
 @admin.route('/admin/products')
 @login_required
 @admin_required
 def products():
-    all_products = Product.query.all()
+    all_products = Product.query.filter_by(owner_id=current_user.id).all()
     return render_template('admin/products.html', products=all_products)
 
 @admin.route('/admin/products/add', methods=['GET', 'POST'])
@@ -87,7 +94,8 @@ def add_product():
             unit=unit,
             current_stock=current_stock,
             threshold=threshold,
-            created_by=current_user.id
+            created_by=current_user.id,
+            owner_id=current_user.id
         )
         db.session.add(product)
         db.session.commit()
@@ -100,7 +108,7 @@ def add_product():
 @login_required
 @admin_required
 def edit_product(id):
-    product = Product.query.get_or_404(id)
+    product = Product.query.filter_by(id=id, owner_id=current_user.id).first_or_404()
 
     if request.method == 'POST':
         product.name = request.form.get('name')
@@ -109,7 +117,7 @@ def edit_product(id):
         product.current_stock = float(request.form.get('current_stock'))
         product.threshold = float(request.form.get('threshold'))
         db.session.commit()
-        flash(f'Product updated successfully!', 'success')
+        flash('Product updated successfully!', 'success')
         return redirect(url_for('admin.products'))
 
     return render_template('admin/edit_product.html', product=product)
@@ -118,17 +126,17 @@ def edit_product(id):
 @login_required
 @admin_required
 def delete_product(id):
-    product = Product.query.get_or_404(id)
+    product = Product.query.filter_by(id=id, owner_id=current_user.id).first_or_404()
     db.session.delete(product)
     db.session.commit()
-    flash(f'Product deleted successfully!', 'success')
+    flash('Product deleted successfully!', 'success')
     return redirect(url_for('admin.products'))
 
 @admin.route('/admin/employees')
 @login_required
 @admin_required
 def employees():
-    all_employees = User.query.filter_by(role='employee').all()
+    all_employees = User.query.filter_by(role='employee', owner_id=current_user.id).all()
     return render_template('admin/employees.html', employees=all_employees)
 
 @admin.route('/admin/employees/add', methods=['GET', 'POST'])
@@ -150,7 +158,8 @@ def add_employee():
             name=name,
             email=email,
             password_hash=generate_password_hash(password),
-            role='employee'
+            role='employee',
+            owner_id=current_user.id
         )
         db.session.add(employee)
         db.session.commit()
@@ -168,11 +177,14 @@ def deactivate_employee(id):
     db.session.commit()
     flash(f'Employee "{employee.name}" deactivated!', 'warning')
     return redirect(url_for('admin.employees'))
+
 @admin.route('/admin/alerts')
 @login_required
 @admin_required
 def alerts():
-    all_alerts = Alert.query.order_by(Alert.created_at.desc()).all()
+    all_alerts = Alert.query.join(Product).filter(
+        Product.owner_id == current_user.id
+    ).order_by(Alert.created_at.desc()).all()
     return render_template('admin/alerts.html', alerts=all_alerts)
 
 @admin.route('/admin/alerts/read/<int:id>', methods=['POST'])
@@ -189,12 +201,15 @@ def mark_read(id):
 @login_required
 @admin_required
 def transactions():
-    all_transactions = Transaction.query.order_by(Transaction.timestamp.desc()).all()
+    all_transactions = Transaction.query.join(Product).filter(
+        Product.owner_id == current_user.id
+    ).order_by(Transaction.timestamp.desc()).all()
     return render_template('admin/transactions.html', transactions=all_transactions)
+
 @admin.route('/admin/predictions')
 @login_required
 @admin_required
 def predictions():
     from app.ml.predictor import get_all_predictions
-    data = get_all_predictions()
+    data = get_all_predictions(current_user.id)
     return render_template('admin/predictions.html', data=data)

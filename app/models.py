@@ -14,6 +14,8 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='employee')
     is_active = db.Column(db.Boolean, default=True)
+    store_name = db.Column(db.String(200), nullable=True)
+    owner_id = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     transactions = db.relationship('Transaction', backref='user', lazy=True)
@@ -29,6 +31,7 @@ class Product(db.Model):
     unit = db.Column(db.String(50), nullable=False)
     current_stock = db.Column(db.Float, nullable=False, default=0)
     threshold = db.Column(db.Float, nullable=False, default=10)
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
