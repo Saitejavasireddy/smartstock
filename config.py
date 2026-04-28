@@ -10,6 +10,11 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql+psycopg2://teja@localhost:5432/smartstock_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    # Session settings
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    
     # Mail settings
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
