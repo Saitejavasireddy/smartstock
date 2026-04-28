@@ -6,14 +6,16 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'smartstock-secret-key-2024'
     
-    # PostgreSQL connection
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql+psycopg2://teja@localhost:5432/smartstock_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Session settings
-    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    REMEMBER_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_DURATION = 86400
     
     # Mail settings
     MAIL_SERVER = 'smtp.gmail.com'
@@ -22,6 +24,3 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or ''
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or ''
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_USERNAME') or ''
-    REMEMBER_COOKIE_SECURE = False
-    REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_DURATION = 86400
